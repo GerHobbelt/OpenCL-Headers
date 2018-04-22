@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.11)
 project(OpenCL-Loader)
 
-set(CMAKE_CONFIGURATION_TYPES "Release")
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 
 if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/opencl_loader)
   message(STATUS "Generating OpenCL API Loaders")
