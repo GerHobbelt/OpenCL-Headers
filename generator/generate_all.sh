@@ -52,8 +52,8 @@ function generate_loader() {
   headers=
   includes=
   for hdr in $(echo *.h); do
-    #skip d3d/dx headers for now
-    if [[ ${hdr/d3d/} == ${hdr} && ${hdr/dx/} == ${hdr} ]]; then
+    #skip d3d, dx, and intel headers for now
+    if [[ ${hdr/d3d/} == ${hdr} && ${hdr/dx/} == ${hdr} && ${hdr/intel/} == ${hdr} ]]; then
       headers="${headers} ${hdr}"
       includes="${includes}#include \"CL/${hdr}\""
     fi
