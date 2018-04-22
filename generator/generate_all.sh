@@ -45,7 +45,7 @@ function generate_loader() {
   local src="${ver_out_dir}/src/${api_ver}_loader.c"
 
   mkdir -p "${ver_out_dir}/src"
-  mkdir -p "${ver_out_dir}/CL"
+  mkdir -p "${ver_out_dir}/include/CL"
 
   cd "${api_ver}/CL"
 
@@ -55,6 +55,7 @@ function generate_loader() {
 // $(date)
 //
 #include "CL/opencl.h"
+#include <dlfcn.h>
 
 int initialize_${api_ver}() {
   void *libopencl = dlopen("libopencl.so", RTLD_NOW | RTLD_LOCAL);
@@ -63,8 +64,8 @@ EOF
 
   for hdr in $(echo *.h); do
     #skip all non-standard headers for now
-    if [[ ${hdr/d3d/} == ${hdr} && ${hdr/dx/} == ${hdr} && ${hdr/_ext_} == ${hdr} ]]; then
-      process_header "${api_ver}" "${hdr}" "${ver_out_dir}/CL/${hdr}" "${src}"
+    if [[ ${hdr/d3d/} == ${hdr} && ${hdr/dx/} == ${hdr} ]]; then # && ${hdr/_ext_} == ${hdr} ]]; then
+      process_header "${api_ver}" "${hdr}" "${ver_out_dir}/include/CL/${hdr}" "${src}"
     fi
   done
 
@@ -81,6 +82,8 @@ EOF
 
 cd "${api_dir}"
 for api_ver in opencl*; do
-  echo "Generating Loader for ${api_ver}"
-  generate_loader "${api_ver}"
+  if [[ ${api_ver} != "opencl_loader" ]]; then
+    echo "Generating Loader for ${api_ver}"
+    generate_loader "${api_ver}"
+  fi
 done
