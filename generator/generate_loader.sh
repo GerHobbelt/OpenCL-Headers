@@ -39,10 +39,15 @@ EOF
   fi # opencl.h
 }
 
-function generate_loader() {
+function gen_loader() {
   local api_ver="${1}"
   local ver_out_dir="${out_dir}/${api_ver}"
   local src="${ver_out_dir}/src/${api_ver}_loader.c"
+
+  if [[ ! -d "${api_ver}/CL" ]]; then
+    echo "${api_ver} is not an OpenCL API directory." 1>&2
+    return -1
+  fi
 
   mkdir -p "${ver_out_dir}/src"
   mkdir -p "${ver_out_dir}/include/CL"
@@ -100,9 +105,19 @@ EOF
 }
 
 cd "${api_dir}"
-for api_ver in opencl*; do
-  if [[ ${api_ver} != "opencl_loader" ]]; then
-    echo "Generating Loader for ${api_ver}"
-    generate_loader "${api_ver}"
-  fi
-done
+
+if [[ -n "${1}" ]]; then
+  for api_ver in "${@}"; do
+    if [[ ${api_ver} != "opencl_loader" ]]; then
+      echo "Generating Loader for ${api_ver}"
+      gen_loader "${api_ver}"
+    fi
+  done
+else
+  for api_ver in opencl*; do
+    if [[ ${api_ver} != "opencl_loader" ]]; then
+      echo "Generating OpenCL Loader for ${api_ver}"
+      gen_loader "${api_ver}"
+    fi
+  done
+fi

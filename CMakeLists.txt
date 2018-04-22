@@ -3,18 +3,18 @@ project(OpenCL-Loader)
 
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 
-if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/opencl_loader)
-  message(STATUS "Generating OpenCL API Loaders")
-  execute_process ( COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/generator/generate_all.sh  
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ )
-else()
-  message(STATUS "OpenCL API Loaders exist")
-endif()
-
-file(GLOB OPENCL_VERSIONS LIST_DIRECTORIES true RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/opencl_loader/ "${CMAKE_CURRENT_SOURCE_DIR}/opencl_loader/opencl*")
+file(GLOB OPENCL_VERSIONS LIST_DIRECTORIES true RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/opencl*")
+list(REMOVE_ITEM OPENCL_VERSIONS opencl_loader)
 
 set(OPENCL_VERSION "opencl12" CACHE STRING "OpenCL API Version")
 set_property(CACHE OPENCL_VERSION PROPERTY STRINGS ${OPENCL_VERSIONS})
+
+if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/opencl_loader/${OPENCL_VERSION})
+  execute_process ( COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/generator/generate_loader.sh ${OPENCL_VERSION}
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ )
+else()
+  message(STATUS "OpenCL API Loader for ${OPENCL_VERSION} exists.")
+endif()
 
 set(API_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/opencl_loader/${OPENCL_VERSION}/include")
 
