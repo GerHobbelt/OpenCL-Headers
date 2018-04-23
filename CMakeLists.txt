@@ -1,6 +1,30 @@
 cmake_minimum_required(VERSION 3.11)
 project(OpenCL-Loader)
 
+function(configure_bash)
+  if(EXISTS "${BASH}")
+    message(STATUS "Using predefined shell ${BASH}")
+    return()
+  endif()
+
+  set(_BASH bash)
+
+  if(CMAKE_HOST_SYSTEM MATCHES "Windows")
+    find_package(Git)
+    if(NOT GIT_FOUND)
+      message(FATAL_ERROR "git bash required on windows.")
+    endif()
+    string(REPLACE "git.exe" "bash.exe" _BASH ${GIT_EXECUTABLE})
+    string(REGEX REPLACE "mingw[0-9]*/" "" _BASH ${_BASH})
+    if(NOT EXISTS "${_BASH}")
+      message(FATAL_ERROR "${_BASH} does not exist. git bash required on windows.")
+    endif()
+  endif()
+
+  set(BASH ${_BASH} PARENT_SCOPE)
+  message(STATUS "Using shell ${_BASH}")
+endfunction()
+
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 
 file(GLOB OPENCL_VERSIONS LIST_DIRECTORIES true RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/opencl*")
@@ -10,7 +34,11 @@ set(OPENCL_VERSION "opencl12" CACHE STRING "OpenCL API Version")
 set_property(CACHE OPENCL_VERSION PROPERTY STRINGS ${OPENCL_VERSIONS})
 
 if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/opencl_loader/${OPENCL_VERSION})
-  execute_process ( COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/generator/generate_loader.sh ${OPENCL_VERSION}
+  message(STATUS "OpenCL API Loader for ${OPENCL_VERSION} does not exist.")
+
+  configure_bash()
+
+  execute_process ( COMMAND "${BASH}" "${CMAKE_CURRENT_SOURCE_DIR}/generator/generate_loader.sh" ${OPENCL_VERSION}
                     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ )
 else()
   message(STATUS "OpenCL API Loader for ${OPENCL_VERSION} exists.")

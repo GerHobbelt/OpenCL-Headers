@@ -31,7 +31,8 @@ EOF
 #ifdef __cplusplus
 extern "C" {
 #endif
-extern int initialize_${api_ver}();
+#define OPENCL_LOADER_API_VERSION ${api_ver/opencl/}
+extern int initialize_opencl();
 #ifdef __cplusplus
 }
 #endif
@@ -76,17 +77,14 @@ ${includes}
 
 #include <dlfcn.h>
 
-int initialize_${api_ver}() {
+int initialize_opencl() {
   static int s_initted = 0;
-  static int s_initResult = 0;
-  if ( s_initted ) return s_initResult;
-
-  s_initted = 1;
+  if ( s_initted ) return 1;
 
   void *libopencl = dlopen("libopencl.so", RTLD_NOW | RTLD_LOCAL);
-
   if (!libopencl) return 0;
-  s_initResult = 1;
+
+  s_initted = 1;
 EOF
 
   for hdr in ${headers}; do
