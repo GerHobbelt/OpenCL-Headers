@@ -5,12 +5,12 @@ function output_cur_sig() {
     if(!SKIPPING) {
       gsub( /\s+/, " ", CUR_SIG);
 
-      gsub(CUR_FN, "(*PFN_"CUR_FN")", CUR_SIG);
+      gsub("CL_API_CALL "CUR_FN, "(CL_API_CALL *PFN_"CUR_FN")", CUR_SIG);
       printf("typedef %s\n", CUR_SIG) >> hdr_out;
 
       printf("extern PFN_%s %s;\n", CUR_FN, CUR_FN) >> hdr_out;
 
-      printf("  %s = (PFN_%s)dlsym(libopencl, \"%s\");\n", CUR_FN, CUR_FN, CUR_FN) >> src_out;
+      printf("  %s = (PFN_%s)find_lib_func(libopencl, \"%s\");\n", CUR_FN, CUR_FN, CUR_FN) >> src_out;
     }
     SKIPPING=0;
     CUR_SIG="";
@@ -62,7 +62,7 @@ BEGIN {
   gsub(/ \*/, "*", $0);
 
   #skip first 2 fields
-  line=$3
+  line=$3;
   for(i = 4; i <= NF; i++) {
     line=line " " $i;
   }

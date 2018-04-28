@@ -24,7 +24,7 @@ function process_header() {
 EOF
 
   #primary - include the initialize function decl
-  "${generator_dir}"/process_header.gawk -v src_out="${src_out}" -vsrc_out_decl="${src_out}.decl" -v hdr_out="${hdr_out}" "${hdr}"
+  "${generator_dir}"/process_header.sh -v src_out="${src_out}" -vsrc_out_decl="${src_out}.decl" -v hdr_out="${hdr_out}" "${hdr}"
 
   if [[ "${hdr_in}" == "opencl.h" ]]; then
     cat << EOF >> "${hdr_out}"
@@ -55,9 +55,14 @@ function gen_loader() {
 
   cd "${api_ver}/CL"
 
+  hpps=$(echo *.hpp)
+  if [[ "${hpps}" == '*.hpp' ]]; then
+    hpps=
+  fi
+
   headers=
   includes=
-  for hdr in $(echo *.h); do
+  for hdr in *.h; do
     #skip d3d, dx, and intel headers for now
     if [[ ${hdr/d3d/} == ${hdr} && ${hdr/dx/} == ${hdr} && ${hdr/intel/} == ${hdr} ]]; then
       headers="${headers} ${hdr}"
@@ -75,18 +80,40 @@ function gen_loader() {
 #include "CL/opencl.h"
 ${includes}
 
-#include <dlfcn.h>
+#if defined(_WIN32)
+# define VC_EXTRALEAN 1
+# include <windows.h>
+# define LIB_PFX ""
+# define LIB_SFX ".dll"
+  typedef HMODULE libptr;
+  typedef FARPROC funcptr;
+  inline libptr open_lib(const char* path) { return LoadLibrary( path ); }
+  inline funcptr find_lib_func(libptr lib, const char* name) { return GetProcAddress( lib, (char*)name ); }
+# define NULL_LIB ((libptr)0)
+#elif defined(__ANDROID__) || defined(__linux__) || defined(__APPLE__)
+# include <dlfcn.h>
+# define LIB_PFX "lib"
+# if defined(__APPLE__)
+#   define LIB_SFX ".dylib"
+# else
+#   define LIB_SFX ".so"
+# endif
+  typedef void* libptr;
+  typedef void* funcptr;
+  inline libptr open_lib(const char* path) { return dlopen( path, RTLD_NOW | RTLD_LOCAL );}
+  inline funcptr find_lib_func(libptr lib, const char* name) { return dlsym( lib, name ); }
+# define NULL_LIB ((libptr)0)
+#else
+# error Unsupported OS!
+#endif
 
 int initialize_opencl() {
   static int s_initted = 0;
   if ( s_initted ) return 1;
 
-  void *libopencl = 0;
-
-  libopencl = dlopen("libOpenCL.so", RTLD_NOW | RTLD_LOCAL);
-  if ( !libopencl ) { libopencl = dlopen("libopencl.so", RTLD_NOW | RTLD_LOCAL); }
-
-  if (!libopencl) return 0;
+  libptr libopencl = open_lib(LIB_PFX "OpenCL" LIB_SFX);
+  if ( libopencl == NULL_LIB ) { libopencl = open_lib(LIB_PFX "opencl" LIB_SFX); }
+  if ( libopencl == NULL_LIB ) return 0;
 
   s_initted = 1;
 EOF
@@ -94,6 +121,12 @@ EOF
   for hdr in ${headers}; do
     process_header "${api_ver}" "${hdr}" "${ver_out_dir}/include/CL/${hdr}" "${src}"
   done
+
+  if [[ "${hpps}" ]]; then
+    for hpp in ${hpps}; do
+      cp -v "${hpp}" "${ver_out_dir}/include/CL/${hpp}"
+    done
+  fi
 
   cat >> "${src}" << EOF
   return 1;
