@@ -87,8 +87,8 @@ ${includes}
 # define LIB_SFX ".dll"
   typedef HMODULE libptr;
   typedef FARPROC funcptr;
-  inline libptr open_lib(const char* path) { return LoadLibrary( path ); }
-  inline funcptr find_lib_func(libptr lib, const char* name) { return GetProcAddress( lib, (char*)name ); }
+  static libptr open_lib(const char* path) { return LoadLibrary( path ); }
+  static funcptr find_lib_func(libptr lib, const char* name) { return GetProcAddress( lib, (char*)name ); }
 # define NULL_LIB ((libptr)0)
 #elif defined(__ANDROID__) || defined(__linux__) || defined(__APPLE__)
 # include <dlfcn.h>
@@ -100,8 +100,8 @@ ${includes}
 # endif
   typedef void* libptr;
   typedef void* funcptr;
-  inline libptr open_lib(const char* path) { return dlopen( path, RTLD_NOW | RTLD_LOCAL );}
-  inline funcptr find_lib_func(libptr lib, const char* name) { return dlsym( lib, name ); }
+  static libptr open_lib(const char* path) { return dlopen( path, RTLD_NOW | RTLD_LOCAL );}
+  static funcptr find_lib_func(libptr lib, const char* name) { return dlsym( lib, name ); }
 # define NULL_LIB ((libptr)0)
 #else
 # error Unsupported OS!
