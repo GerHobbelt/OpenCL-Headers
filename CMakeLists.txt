@@ -1,7 +1,13 @@
 cmake_minimum_required(VERSION 3.11)
 project(OpenCL-Loader)
 
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
+
 file(GLOB GEN_SRC "generator/*.*")
+file(GLOB OPENCL_VERSIONS LIST_DIRECTORIES true RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/opencl*")
+
+set(OPENCL_VERSION "opencl12" CACHE STRING "OpenCL API Version")
+set_property(CACHE OPENCL_VERSION PROPERTY STRINGS ${OPENCL_VERSIONS})
 
 function(configure_bash)
   if(EXISTS "${BASH}")
@@ -27,15 +33,16 @@ function(configure_bash)
   message(STATUS "Using shell ${_BASH}")
 endfunction()
 
-set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
+find_package(Git)
+if(NOT EXISTS ${GIT_EXECUTABLE})
+  message(FATAL_ERROR "Git not installed!")
+endif()
 
-file(GLOB OPENCL_VERSIONS LIST_DIRECTORIES true RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/opencl*")
-list(REMOVE_ITEM OPENCL_VERSIONS opencl_loader)
+execute_process(  COMMAND ${GIT_EXECUTABLE} submodule init
+                  COMMAND ${GIT_EXECUTABLE} submodule update
+                  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} )
 
-set(OPENCL_VERSION "opencl12" CACHE STRING "OpenCL API Version")
-set_property(CACHE OPENCL_VERSION PROPERTY STRINGS ${OPENCL_VERSIONS})
-
-set(STAMP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/opencl_loader/${OPENCL_VERSION}/include/CL/opencl.h)
+set(STAMP_FILE ${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include/CL/opencl.h)
 
 set(LOADER_OOD false)
 
@@ -49,24 +56,38 @@ endif()
 
 if(LOADER_OOD)
   message( STATUS "Generated loader code OOD")
-  file(REMOVE_RECURSE ${CMAKE_CURRENT_SOURCE_DIR}/opencl_loader/${OPENCL_VERSION})
+  file(REMOVE_RECURSE ${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION})
 endif()
 
-if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/opencl_loader/${OPENCL_VERSION})
+if(NOT EXISTS ${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION})
   message(STATUS "Generating OpenCL API Loader for ${OPENCL_VERSION}.")
-
   configure_bash()
-
-  execute_process ( COMMAND "${BASH}" "${CMAKE_CURRENT_SOURCE_DIR}/generator/generate_loader.sh" ${OPENCL_VERSION}
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ )
+  execute_process ( COMMAND "${BASH}" "${CMAKE_SOURCE_DIR}/generator/generate_loader.sh" ${OPENCL_VERSION}
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/ )
 else()
   message(STATUS "OpenCL API Loader for ${OPENCL_VERSION} exists.")
 endif()
 
-set(API_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/opencl_loader/${OPENCL_VERSION}/include")
+set(CLHPP_OUT ${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include/CL/cl.hpp)
 
-file(GLOB API_HEADERS "${API_INCLUDE_DIR}/CL/*.h")
-file(GLOB LIB_SRC "opencl_loader/${OPENCL_VERSION}/src/*.c")
+if(OPENCL_VERSION MATCHES "opencl2")
+  configure_file(${CMAKE_SOURCE_DIR}/OpenCL-CLHPP/input_cl2.hpp ${CLHPP_OUT})
+else()
+  find_package(PythonInterp)
+  if(NOT EXISTS ${PYTHON_EXECUTABLE})
+    message(FATAL_ERROR "Python not installed - required to generate OpenCL 1.X hpp file")
+  endif()
+
+  if(${CMAKE_SOURCE_DIR}/OpenCL-CLHPP/input_cl.hpp IS_NEWER_THAN ${CLHPP_OUT})
+    execute_process(  COMMAND ${PYTHON_EXECUTABLE} gen_cl_hpp.py -i input_cl.hpp -o ${CLHPP_OUT}
+                      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/OpenCL-CLHPP )
+  endif()
+endif()
+
+set(API_INCLUDE_DIR "${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include")
+
+file(GLOB API_HEADERS "${API_INCLUDE_DIR}/CL/*.h" "${API_INCLUDE_DIR}/CL/*.hpp")
+file(GLOB LIB_SRC "${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/src/*.c")
 
 add_library(${PROJECT_NAME} STATIC ${LIB_SRC} ${API_HEADERS} ${GEN_SRC})
 
