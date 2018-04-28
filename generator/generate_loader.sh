@@ -122,12 +122,6 @@ EOF
     process_header "${api_ver}" "${hdr}" "${ver_out_dir}/include/CL/${hdr}" "${src}"
   done
 
-  if [[ "${hpps}" ]]; then
-    for hpp in ${hpps}; do
-      cp -v "${hpp}" "${ver_out_dir}/include/CL/${hpp}"
-    done
-  fi
-
   cat >> "${src}" << EOF
   return 1;
 }
@@ -135,6 +129,21 @@ EOF
 
   cat "${src}.decl" >> "${src}"
   rm "${src}.decl"
+
+  if [[ "${hpps}" ]]; then
+    for hpp in ${hpps}; do
+      cp -v "${hpp}" "${ver_out_dir}/include/CL/${hpp}"
+    done
+  fi
+
+  # cl.hpp needs special attention - it passes pointers to clGetXXX functions around.
+  # because function names now correspond to pointers instead of prototypes the syntax
+  # used in cl.hpp to refer to api function pointers is off by a level of indirection.
+  # &::clGetXXX of a global pointer-to-func is a pointer pointer
+  if [[ -f "${ver_out_dir}/include/CL/cl.hpp" ]]; then
+    sed 's/\&::clGet/::clGet/g' "${ver_out_dir}/include/CL/cl.hpp" > "${ver_out_dir}/include/CL/cl.hpp.fixed"
+    mv -f "${ver_out_dir}/include/CL/cl.hpp.fixed" "${ver_out_dir}/include/CL/cl.hpp"
+  fi
 
   cd  "${api_dir}"
 }

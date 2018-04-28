@@ -59,14 +59,7 @@ if(LOADER_OOD)
   file(REMOVE_RECURSE ${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION})
 endif()
 
-if(NOT EXISTS ${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION})
-  message(STATUS "Generating OpenCL API Loader for ${OPENCL_VERSION}.")
-  configure_bash()
-  execute_process ( COMMAND "${BASH}" "${CMAKE_SOURCE_DIR}/generator/generate_loader.sh" ${OPENCL_VERSION}
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/ )
-else()
-  message(STATUS "OpenCL API Loader for ${OPENCL_VERSION} exists.")
-endif()
+make_directory(${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include/CL)
 
 set(CLHPP_OUT ${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include/CL/cl.hpp)
 
@@ -82,6 +75,15 @@ else()
     execute_process(  COMMAND ${PYTHON_EXECUTABLE} gen_cl_hpp.py -i input_cl.hpp -o ${CLHPP_OUT}
                       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/OpenCL-CLHPP )
   endif()
+endif()
+
+if(NOT EXISTS ${STAMP_FILE})
+  message(STATUS "Generating OpenCL API Loader for ${OPENCL_VERSION}.")
+  configure_bash()
+  execute_process ( COMMAND "${BASH}" "${CMAKE_SOURCE_DIR}/generator/generate_loader.sh" ${OPENCL_VERSION}
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/ )
+else()
+  message(STATUS "OpenCL API Loader for ${OPENCL_VERSION} exists.")
 endif()
 
 set(API_INCLUDE_DIR "${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include")
