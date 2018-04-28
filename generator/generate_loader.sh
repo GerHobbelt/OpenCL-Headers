@@ -81,7 +81,7 @@ int initialize_opencl() {
   static int s_initted = 0;
   if ( s_initted ) return 1;
 
-  void *libopencl = nullptr;
+  void *libopencl = 0;
 
   libopencl = dlopen("libOpenCL.so", RTLD_NOW | RTLD_LOCAL);
   if ( !libopencl ) { libopencl = dlopen("libopencl.so", RTLD_NOW | RTLD_LOCAL); }
