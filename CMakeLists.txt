@@ -102,5 +102,10 @@ target_include_directories(
  ${API_INCLUDE_DIR}
 )
 
+set(CL_INSTALL_SUBDIR "CL")
+if(APPLE)
+  set(CL_INSTALL_SUBDIR "OpenCL")
+endif()
+
 install(FILES $<TARGET_FILE:${PROJECT_NAME}> DESTINATION lib)
-install(DIRECTORY ${API_INCLUDE_DIR}/CL DESTINATION include/)
+install(DIRECTORY ${API_INCLUDE_DIR}/CL/ DESTINATION include/${CL_INSTALL_SUBDIR})
