@@ -62,19 +62,20 @@ endif()
 make_directory(${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include/CL)
 
 set(CLHPP_OUT ${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include/CL/cl.hpp)
+set(CL2HPP_OUT ${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include/CL/cl2.hpp)
 
-if(OPENCL_VERSION MATCHES "opencl2")
-  configure_file(${CMAKE_SOURCE_DIR}/OpenCL-CLHPP/input_cl2.hpp ${CLHPP_OUT})
-else()
+if(${CMAKE_SOURCE_DIR}/OpenCL-CLHPP/input_cl.hpp IS_NEWER_THAN ${CLHPP_OUT})
   find_package(PythonInterp)
   if(NOT EXISTS ${PYTHON_EXECUTABLE})
     message(FATAL_ERROR "Python not installed - required to generate OpenCL 1.X hpp file")
   endif()
 
-  if(${CMAKE_SOURCE_DIR}/OpenCL-CLHPP/input_cl.hpp IS_NEWER_THAN ${CLHPP_OUT})
-    execute_process(  COMMAND ${PYTHON_EXECUTABLE} gen_cl_hpp.py -i input_cl.hpp -o ${CLHPP_OUT}
-                      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/OpenCL-CLHPP )
-  endif()
+  execute_process(  COMMAND ${PYTHON_EXECUTABLE} gen_cl_hpp.py -i input_cl.hpp -o ${CLHPP_OUT}
+                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/OpenCL-CLHPP )
+endif()
+
+if(OPENCL_VERSION MATCHES "opencl2")
+  configure_file(${CMAKE_SOURCE_DIR}/OpenCL-CLHPP/input_cl2.hpp ${CL2HPP_OUT})
 endif()
 
 if(NOT EXISTS ${STAMP_FILE})

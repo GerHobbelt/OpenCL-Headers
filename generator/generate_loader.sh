@@ -31,7 +31,7 @@ EOF
 #ifdef __cplusplus
 extern "C" {
 #endif
-#define OPENCL_LOADER_API_VERSION ${api_ver/opencl/}
+#define OPENCL_LOADER_API_VERSION ${api_ver/opencl/}**
 extern int initialize_opencl();
 #ifdef __cplusplus
 }
@@ -136,14 +136,18 @@ EOF
     done
   fi
 
-  # cl.hpp needs special attention - it passes pointers to clGetXXX functions around.
+  # cl.hpp needs special attention - pointers to clGetXXX functions get passed around.
   # because function names now correspond to pointers instead of prototypes the syntax
-  # used in cl.hpp to refer to api function pointers is off by a level of indirection.
+  # used in those heades to refer to api function pointers is off by a level of indirection.
   # &::clGetXXX of a global pointer-to-func is a pointer pointer
-  if [[ -f "${ver_out_dir}/include/CL/cl.hpp" ]]; then
-    sed 's/\&::clGet/::clGet/g' "${ver_out_dir}/include/CL/cl.hpp" > "${ver_out_dir}/include/CL/cl.hpp.fixed"
-    mv -f "${ver_out_dir}/include/CL/cl.hpp.fixed" "${ver_out_dir}/include/CL/cl.hpp"
-  fi
+  for hpp_name in cl.hpp; do # cl2.hpp; do # cl2.hpp appears to handle both cases via template magic
+    hpp="${ver_out_dir}/include/CL"/${hpp_name}
+    if [[ -f "${hpp}" ]]; then
+      echo "// ${hpp_name} Processed by OpenCL-Loader Generator $(date)" > "${hpp}.fixed"
+      sed 's/\&::clGet/::clGet/g' "${hpp}" >> "${hpp}.fixed"
+      mv -f "${hpp}.fixed" "${hpp}"
+    fi
+  done
 
   cd  "${api_dir}"
 }
