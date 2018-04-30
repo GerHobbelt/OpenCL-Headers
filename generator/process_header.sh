@@ -1,6 +1,6 @@
 #!/bin/gawk -f
 
-function output_cur_sig() {
+function output_cur_proto() {
   if (CUR_FN) {
     if(!SKIPPING) {
       gsub( /\s+/, " ", CUR_SIG);
@@ -36,7 +36,7 @@ function process_proto_line(line) {
   }
 
   if(match(line, /\;\s*$/)) {
-    output_cur_sig();
+    output_cur_proto();
   }
 }
 
