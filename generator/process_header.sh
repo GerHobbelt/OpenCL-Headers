@@ -1,7 +1,7 @@
 function output_cur_proto() {
   if (CUR_FN) {
     if(!SKIPPING) {
-      gsub( /\s+/, " ", CUR_SIG);
+      gsub( /[ \t]+/, " ", CUR_SIG);
 
       gsub("CL_API_CALL "CUR_FN, "(CL_API_CALL *PFN_"CUR_FN")", CUR_SIG);
       printf("typedef %s\n", CUR_SIG) >> hdr_out;
@@ -32,7 +32,7 @@ function process_proto_line(line) {
     }
   }
 
-  if(match(line, /\;\s*$/)) {
+  if(match(line, /\;[ \t]*$/)) {
     output_cur_proto();
   }
 }

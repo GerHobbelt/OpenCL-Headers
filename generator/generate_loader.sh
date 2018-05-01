@@ -1,14 +1,5 @@
 #!/bin/bash
 
-#set -x
-
-generator_dir=$(dirname "${0}")
-generator_dir=$(cd "${generator_dir}"; pwd)
-
-api_dir=$(cd "${generator_dir}"; cd ..; pwd)
-
-out_dir="$(pwd)/opencl_loader"
-
 if [[ "$(uname -s)" == "Darwin" ]]; then
   AWK=awk
   CL_SUBDIR=OpenCL
@@ -18,6 +9,14 @@ else
   CL_SUBDIR=CL
   APPLE=false
 fi
+
+generator_dir=$(dirname "${0}")
+generator_dir=$(cd "${generator_dir}"; pwd)
+
+api_dir=$(cd "${generator_dir}"; cd ..; pwd)
+
+out_dir="$(pwd)/opencl_loader"
+
 
 function process_header() {
   local api_ver="${1}"
@@ -53,7 +52,7 @@ EOF
 function gen_loader() {
   local api_ver="${1}"
   local ver_out_dir="${out_dir}/${api_ver}"
-  local include_out="${ver_out_dir}/include/${CL_SUBDIR}"
+  local include_out_dir="${ver_out_dir}/include/${CL_SUBDIR}"
   local src_out="${ver_out_dir}/src/${api_ver}_loader.c"
 
   if [[ ! -d "${api_ver}/CL" ]]; then
@@ -62,7 +61,7 @@ function gen_loader() {
   fi
 
   mkdir -p "${ver_out_dir}/src"
-  mkdir -p "${include_out}"
+  mkdir -p "${include_out_dir}"
 
   cd "${api_ver}/CL"
 
@@ -134,7 +133,7 @@ int initialize_opencl() {
 EOF
 
   for hdr in ${headers}; do
-    process_header "${api_ver}" "${hdr}" "${ver_out_dir}/include/${CL_SUBDIR}/${hdr}" "${src_out}"
+    process_header "${api_ver}" "${hdr}" "${include_out_dir}/${hdr}" "${src_out}"
   done
 
   cat >> "${src_out}" << EOF
@@ -147,7 +146,7 @@ EOF
 
   if [[ "${hpps}" ]]; then
     for hpp in ${hpps}; do
-      cp -v "${hpp}" "${ver_out_dir}/include/${CL_SUBDIR}/${hpp}"
+      cp -v "${hpp}" "${include_out_dir}/${hpp}"
     done
   fi
 
@@ -156,7 +155,7 @@ EOF
   # used in those heades to refer to api function pointers is off by a level of indirection.
   # &::clGetXXX of a global pointer-to-func is a pointer pointer
   for hpp_name in cl.hpp; do # cl2.hpp; do # cl2.hpp appears to handle both cases via template magic
-    hpp="${ver_out_dir}/include/${CL_SUBDIR}"/${hpp_name}
+    hpp="${include_out_dir}"/${hpp_name}
     if [[ -f "${hpp}" ]]; then
       echo "// ${hpp_name} Processed by OpenCL-Loader Generator $(date)" > "${hpp}.fixed"
       sed 's/\&::clGet/::clGet/g' "${hpp}" >> "${hpp}.fixed"

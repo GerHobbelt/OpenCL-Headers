@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.11)
 project(OpenCL-Loader)
 
+set(CL_SUBDIR "CL")
+if(APPLE)
+  set(CL_SUBDIR "OpenCL")
+endif()
+
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 
 file(GLOB GEN_SRC "generator/*.*")
@@ -42,7 +47,7 @@ execute_process(  COMMAND ${GIT_EXECUTABLE} submodule init
                   COMMAND ${GIT_EXECUTABLE} submodule update
                   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} )
 
-set(STAMP_FILE ${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include/CL/opencl.h)
+set(STAMP_FILE ${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include/${CL_SUBDIR}/opencl.h)
 
 set(LOADER_OOD false)
 
@@ -61,8 +66,8 @@ endif()
 
 make_directory(${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include/CL)
 
-set(CLHPP_OUT ${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include/CL/cl.hpp)
-set(CL2HPP_OUT ${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include/CL/cl2.hpp)
+set(CLHPP_OUT ${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include/${CL_SUBDIR}/cl.hpp)
+set(CL2HPP_OUT ${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include/${CL_SUBDIR}/cl2.hpp)
 
 if(${CMAKE_SOURCE_DIR}/OpenCL-CLHPP/input_cl.hpp IS_NEWER_THAN ${CLHPP_OUT})
   find_package(PythonInterp)
@@ -87,9 +92,10 @@ else()
   message(STATUS "OpenCL API Loader for ${OPENCL_VERSION} exists.")
 endif()
 
-set(API_INCLUDE_DIR "${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include")
+set(API_INCLUDE_ROOT "${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include")
+set(API_INCLUDE_DIR "${API_INCLUDE_ROOT}/${CL_SUBDIR}")
 
-file(GLOB API_HEADERS "${API_INCLUDE_DIR}/CL/*.h" "${API_INCLUDE_DIR}/CL/*.hpp")
+file(GLOB API_HEADERS "${API_INCLUDE_DIR}/*.h" "${API_INCLUDE_DIR}/*.hpp")
 file(GLOB LIB_SRC "${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/src/*.c")
 
 add_library(${PROJECT_NAME} STATIC ${LIB_SRC} ${API_HEADERS} ${GEN_SRC})
@@ -100,13 +106,8 @@ source_group("CL" FILES ${API_HEADERS})
 target_include_directories(
  ${PROJECT_NAME}
  PRIVATE
- ${API_INCLUDE_DIR}
+ ${API_INCLUDE_ROOT}
 )
-
-set(CL_SUBDIR "CL")
-if(APPLE)
-  set(CL_SUBDIR "OpenCL")
-endif()
 
 install(FILES $<TARGET_FILE:${PROJECT_NAME}> DESTINATION lib)
 install(DIRECTORY ${API_INCLUDE_DIR}/${CL_SUBDIR}/ DESTINATION include/${CL_SUBDIR})
