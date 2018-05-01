@@ -9,6 +9,15 @@ api_dir=$(cd "${generator_dir}"; cd ..; pwd)
 
 out_dir="$(pwd)/opencl_loader"
 
+AWK=gawk
+if ! 2>&1 which ${AWK} > /dev/null; then
+  AWK=awk
+  if ! 2>&1 which ${AWK} > /dev/null; then
+    echo "No gawk or awk - we're boned." 1>&2
+    exit 1
+  fi
+fi
+
 function process_header() {
   local api_ver="${1}"
   local hdr_in="${2}"
@@ -24,7 +33,7 @@ function process_header() {
 EOF
 
   #primary - include the initialize function decl
-  "${generator_dir}"/process_header.sh -v src_out="${src_out}" -vsrc_out_decl="${src_out}.decl" -v hdr_out="${hdr_out}" "${hdr}"
+  ${AWK} -f "${generator_dir}"/process_header.sh -v src_out="${src_out}" -v src_out_decl="${src_out}.decl" -v hdr_out="${hdr_out}" "${hdr}"
 
   if [[ "${hdr_in}" == "opencl.h" ]]; then
     cat << EOF >> "${hdr_out}"

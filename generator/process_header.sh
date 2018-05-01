@@ -1,5 +1,3 @@
-#!/bin/gawk -f
-
 function output_cur_proto() {
   if (CUR_FN) {
     if(!SKIPPING) {
@@ -27,9 +25,8 @@ function process_proto_line(line) {
 
   if(!CUR_FN) {
     matches[0] = "";
-    if(match(line, /[_a-zA-Z]+[_a-zA-Z0-9]*\(/, matches)) {
-      matches[0] = substr(matches[0],1,length(matches[0])-1);
-      CUR_FN=matches[0];
+    if(match(line, /[_a-zA-Z]+[_a-zA-Z0-9]*\(/)) {
+      CUR_FN = substr(line, RSTART, RLENGTH-1);
       FN_COUNT = FN_COUNT + 1;
       FN_NAMES[FN_COUNT] = CUR_FN;
     }
