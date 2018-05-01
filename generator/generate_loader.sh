@@ -31,7 +31,7 @@ EOF
 #ifdef __cplusplus
 extern "C" {
 #endif
-#define OPENCL_LOADER_API_VERSION ${api_ver/opencl/}**
+#define OPENCL_LOADER_API_VERSION ${api_ver/opencl/}
 extern int initialize_opencl();
 #ifdef __cplusplus
 }
