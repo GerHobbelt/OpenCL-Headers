@@ -2,13 +2,13 @@
 
 if [[ "$(uname -s)" == "Darwin" ]]; then
   AWK=awk
-  CL_SUBDIR=OpenCL
   APPLE=true
 else
   AWK=gawk
-  CL_SUBDIR=CL
   APPLE=false
 fi
+
+CL_SUBDIR=OCDL
 
 generator_dir=$(dirname "${0}")
 generator_dir=$(cd "${generator_dir}"; pwd)
@@ -154,12 +154,12 @@ EOF
   # because function names now correspond to pointers instead of prototypes the syntax
   # used in those heades to refer to api function pointers is off by a level of indirection.
   # &::clGetXXX of a global pointer-to-func is a pointer pointer
-  for hpp_name in cl.hpp; do # cl2.hpp; do # cl2.hpp appears to handle both cases via template magic
-    hpp="${include_out_dir}"/${hpp_name}
-    if [[ -f "${hpp}" ]]; then
-      echo "// ${hpp_name} Processed by OpenCL-Loader Generator $(date)" > "${hpp}.fixed"
-      sed 's/\&::clGet/::clGet/g' "${hpp}" >> "${hpp}.fixed"
-      mv -f "${hpp}.fixed" "${hpp}"
+  for hdr_name in cl.hpp; do # cl2.hpp; do # cl2.hpp appears to handle both cases via template magic
+    hdr="${include_out_dir}"/${hdr_name}
+    if [[ -f "${hdr}" ]]; then
+      echo "// ${hdr_name} Processed by OpenCL-Loader Generator $(date)" > "${hdr}.fixed"
+      sed 's/\&::clGet/::clGet/g' "${hdr}" | sed 's:*#include <[Open]*CL/:#include <OCDL/:'>> "${hdr}.fixed"
+      mv -f "${hdr}.fixed" "${hdr}"
     fi
   done
 

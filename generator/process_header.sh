@@ -48,6 +48,12 @@ BEGIN {
   SKIPPING=0;
 }
 
+/#include <[Open]*CL\// { 
+  sub(/[Open]*CL/, "OCDL");
+  print $0 >> hdr_out;
+  next;
+}
+
 /^extern CL_API_ENTRY.*DEPRECATED/ {
   CUR_SIG=$0;
   CUR_FN="DerpEcated";
