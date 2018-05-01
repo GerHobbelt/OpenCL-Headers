@@ -6,6 +6,9 @@ if(APPLE)
   set(CL_SUBDIR "OpenCL")
 endif()
 
+set(API_INCLUDE_ROOT "${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include")
+set(API_INCLUDE_DIR "${API_INCLUDE_ROOT}/${CL_SUBDIR}")
+
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 
 file(GLOB GEN_SRC "generator/*.*")
@@ -64,10 +67,10 @@ if(LOADER_OOD)
   file(REMOVE_RECURSE ${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION})
 endif()
 
-make_directory(${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include/CL)
+make_directory(${API_INCLUDE_DIR})
 
-set(CLHPP_OUT ${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include/${CL_SUBDIR}/cl.hpp)
-set(CL2HPP_OUT ${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include/${CL_SUBDIR}/cl2.hpp)
+set(CLHPP_OUT ${API_INCLUDE_DIR}/cl.hpp)
+set(CL2HPP_OUT ${API_INCLUDE_DIR}/cl2.hpp)
 
 if(${CMAKE_SOURCE_DIR}/OpenCL-CLHPP/input_cl.hpp IS_NEWER_THAN ${CLHPP_OUT})
   find_package(PythonInterp)
@@ -91,9 +94,6 @@ if(NOT EXISTS ${STAMP_FILE})
 else()
   message(STATUS "OpenCL API Loader for ${OPENCL_VERSION} exists.")
 endif()
-
-set(API_INCLUDE_ROOT "${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include")
-set(API_INCLUDE_DIR "${API_INCLUDE_ROOT}/${CL_SUBDIR}")
 
 file(GLOB API_HEADERS "${API_INCLUDE_DIR}/*.h" "${API_INCLUDE_DIR}/*.hpp")
 file(GLOB LIB_SRC "${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/src/*.c")
