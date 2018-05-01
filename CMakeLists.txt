@@ -101,7 +101,7 @@ file(GLOB LIB_SRC "${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/src/*.c")
 add_library(${PROJECT_NAME} STATIC ${LIB_SRC} ${API_HEADERS} ${GEN_SRC})
 
 source_group("Generator" FILES ${GEN_SRC})
-source_group("CL" FILES ${API_HEADERS})
+source_group("${CL_SUBDIR}" FILES ${API_HEADERS})
 
 target_include_directories(
  ${PROJECT_NAME}
