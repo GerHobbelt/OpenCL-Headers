@@ -41,7 +41,9 @@ EOF
 extern "C" {
 #endif
 #define OPENCL_LOADER_API_VERSION ${api_ver/opencl/}
-extern int initialize_opencl();
+/* pass NULL to use default library name */
+/* overrideLibName should be complete file name e.g. OpenCL_Custom.dll or libOpenCL_custom.so */
+extern int initialize_opencl(const char* /*overrideLibName*/);
 #ifdef __cplusplus
 }
 #endif
@@ -121,12 +123,22 @@ ${includes}
 # error Unsupported OS!
 #endif
 
-int initialize_opencl() {
+int initialize_opencl(const char* overrideLibName) {
   static int s_initted = 0;
   if ( s_initted ) return 1;
 
-  libptr libopencl = open_lib(LIB_PFX "OpenCL" LIB_SFX);
-  if ( libopencl == NULL_LIB ) { libopencl = open_lib(LIB_PFX "opencl" LIB_SFX); }
+  libptr libopencl = NULL_LIB;
+
+  if(overrideLibName)
+  {
+    libopencl = open_lib(overrideLibName);
+  }
+  else
+  {
+    libopencl = open_lib(LIB_PFX "OpenCL" LIB_SFX);
+    if ( libopencl == NULL_LIB ) { libopencl = open_lib(LIB_PFX "opencl" LIB_SFX); }
+  }
+  
   if ( libopencl == NULL_LIB ) return 0;
 
   s_initted = 1;
