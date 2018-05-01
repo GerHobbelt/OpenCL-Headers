@@ -110,4 +110,4 @@ target_include_directories(
 )
 
 install(FILES $<TARGET_FILE:${PROJECT_NAME}> DESTINATION lib)
-install(DIRECTORY ${API_INCLUDE_DIR}/${CL_SUBDIR}/ DESTINATION include/${CL_SUBDIR})
+install(DIRECTORY ${API_INCLUDE_DIR}/ DESTINATION include/${CL_SUBDIR})
