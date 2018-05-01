@@ -158,7 +158,7 @@ EOF
     hdr="${include_out_dir}"/${hdr_name}
     if [[ -f "${hdr}" ]]; then
       echo "// ${hdr_name} Processed by OpenCL-Loader Generator $(date)" > "${hdr}.fixed"
-      sed 's/\&::clGet/::clGet/g' "${hdr}" | sed 's:*#include <[Open]*CL/:#include <OCDL/:'>> "${hdr}.fixed"
+      sed 's/\&::clGet/::clGet/g' "${hdr}" | sed 's:#include <[Open]*CL/:#include <OCDL/:'>> "${hdr}.fixed"
       mv -f "${hdr}.fixed" "${hdr}"
     fi
   done
