@@ -1,14 +1,6 @@
 cmake_minimum_required(VERSION 3.11)
 project(OpenCL-Loader)
 
-set(CL_SUBDIR "CL")
-if(APPLE)
-  set(CL_SUBDIR "OpenCL")
-endif()
-
-set(API_INCLUDE_ROOT "${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include")
-set(API_INCLUDE_DIR "${API_INCLUDE_ROOT}/${CL_SUBDIR}")
-
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 
 file(GLOB GEN_SRC "generator/*.*")
@@ -16,6 +8,14 @@ file(GLOB OPENCL_VERSIONS LIST_DIRECTORIES true RELATIVE ${CMAKE_CURRENT_SOURCE_
 
 set(OPENCL_VERSION "opencl12" CACHE STRING "OpenCL API Version")
 set_property(CACHE OPENCL_VERSION PROPERTY STRINGS ${OPENCL_VERSIONS})
+
+set(CL_SUBDIR "CL")
+if(APPLE)
+set(CL_SUBDIR "OpenCL")
+endif()
+
+set(API_INCLUDE_ROOT "${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include")
+set(API_INCLUDE_DIR "${API_INCLUDE_ROOT}/${CL_SUBDIR}")
 
 function(configure_bash)
   if(EXISTS "${BASH}")
