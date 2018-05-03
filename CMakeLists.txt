@@ -9,6 +9,9 @@ file(GLOB OPENCL_VERSIONS LIST_DIRECTORIES true RELATIVE ${CMAKE_CURRENT_SOURCE_
 set(OPENCL_VERSION "opencl12" CACHE STRING "OpenCL API Version")
 set_property(CACHE OPENCL_VERSION PROPERTY STRINGS ${OPENCL_VERSIONS})
 
+set(BUILD_TEST false CACHE BOOL "Build simple test program to verify initialization")
+set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install CACHE PATH "Install location for include/ and lib/")
+
 set(CL_SUBDIR "OCDL")
 
 set(API_INCLUDE_ROOT "${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/include")
@@ -99,16 +102,21 @@ endif()
 file(GLOB API_HEADERS "${API_INCLUDE_DIR}/*.h" "${API_INCLUDE_DIR}/*.hpp")
 file(GLOB LIB_SRC "${CMAKE_BINARY_DIR}/opencl_loader/${OPENCL_VERSION}/src/*.c")
 
+include_directories(
+ ${PROJECT_NAME}
+ PRIVATE
+ ${API_INCLUDE_ROOT}
+)
+
 add_library(${PROJECT_NAME} STATIC ${LIB_SRC} ${API_HEADERS} ${GEN_SRC})
 
 source_group("Generator" FILES ${GEN_SRC})
 source_group("${CL_SUBDIR}" FILES ${API_HEADERS})
 
-target_include_directories(
- ${PROJECT_NAME}
- PRIVATE
- ${API_INCLUDE_ROOT}
-)
+if(BUILD_TEST)
+  add_executable(${PROJECT_NAME}-test ${CMAKE_SOURCE_DIR}/test/test.c)
+  target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
+endif()
 
 install(FILES $<TARGET_FILE:${PROJECT_NAME}> DESTINATION lib)
 install(DIRECTORY ${API_INCLUDE_DIR}/ DESTINATION include/${CL_SUBDIR})
