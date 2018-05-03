@@ -1,12 +1,31 @@
 # OpenCL-Loader
 Dynamic OpenCL loader generator
 
+Tested Platforms:
+* Windows - tested with cmake generator for Visual Studio 2017, Win32 & Win64
+* Apple OSX - tested with cmake generators for make/clang and xcode
+* Android - tested with cmake generator for Visual Studio 2017, ARM64
+
+Pending:
+* Linux - in theory should work, but has not been tested
+
+Prereqs:
+* bash shell and shell tools
+ * windows - git bash
+ * apple - system bash
+ * linux - untested
+* for opencl1X if cl.hpp is needed, python 2.x 
+  * requirement inherited from OpenCL-HPP submodule to generate cl.hpp
+  * cl2.hpp (opencl20 and above) does not have this requirement
+
 Instructions:
-* Clone Repo
-* From bash (git bash on windows) run generator/generate_all.sh
-* directory opencl_loader will be created with sub-directories for each OpenCL API version
-* pick the API version you want to use
-* use the headers in your Android OpenCL application - they replace system headers, so add the directory to your include path
-* compile the matching src/.c file
-* call initialize_openclXX() where XX is the version number
+* clone Repo
+* create a build directory and run cmake from it
+  * set OPENCL_VERSION to the name of any opencl heaader api directory (e.g. opencl12 or opencl20)
+  * default value for OPENCL_VERSION is opencl12
+  * set CMAKE_INSTALL_PREFIX to location of lib/ and include/ destination directories
+* generate project, build INSTALL target
+* header files will be under ${CMAKE_INSTALL_PREFIX}/OCDL/ (O)pen(C)L (D)ynamic (L)oader)
+* include OCDL/opencl.h in one of your source files
+* call `initialize_opencl((const char*)0)` before invoking any opencl functions
 * profit
