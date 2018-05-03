@@ -27,8 +27,14 @@ function(configure_bash)
     if(NOT GIT_FOUND)
       message(FATAL_ERROR "git bash required on windows.")
     endif()
-    string(REPLACE "git.exe" "bash.exe" _BASH ${GIT_EXECUTABLE})
-    string(REGEX REPLACE "mingw[0-9]*/" "" _BASH ${_BASH})
+
+    #strip away all possible sub-paths to git.exe - there are 4 of them
+    string(REGEX REPLACE "mingw[0-9]*/" ""        _BASH ${GIT_EXECUTABLE})
+    string(REGEX REPLACE "cmd/" ""                _BASH ${_BASH})
+    string(REGEX REPLACE "bin/" ""                _BASH ${_BASH})
+    string(REGEX REPLACE "libexec/git-core/" ""   _BASH ${_BASH})
+    string(REPLACE "/git.exe" "/usr/bin/bash.exe" _BASH ${_BASH})
+
     if(NOT EXISTS "${_BASH}")
       message(FATAL_ERROR "${_BASH} does not exist. git bash required on windows.")
     endif()
