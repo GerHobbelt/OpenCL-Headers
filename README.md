@@ -12,9 +12,9 @@ Pending:
 Prereqs:
 * cmake 3.11 or greater
 * bash shell and shell tools
- * windows host - git bash
- * apple host - system bash
- * linux host - system bash
+  * windows host - git bash
+  * apple host - system bash
+  * linux host - system bash
 * for opencl1X if cl.hpp is needed, python 2.x 
   * requirement inherited from OpenCL-HPP submodule to generate cl.hpp
   * cl2.hpp (opencl20 and above) does not have this requirement
