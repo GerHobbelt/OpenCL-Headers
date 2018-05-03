@@ -4,16 +4,17 @@ Dynamic OpenCL loader generator
 Tested Platforms:
 * Windows - tested with cmake generator for Visual Studio 2017, Win32 & Win64
 * Apple OSX - tested with cmake generators for make/clang and xcode
-* Android - tested with cmake generator for Visual Studio 2017, ARM64
+* Android - tested with cmake generator for Visual Studio 2017 ARM64
 
 Pending:
 * Linux - in theory should work, but has not been tested
 
 Prereqs:
+* cmake 3.11 or greater
 * bash shell and shell tools
- * windows - git bash
- * apple - system bash
- * linux - untested
+ * windows host - git bash
+ * apple host - system bash
+ * linux host - system bash
 * for opencl1X if cl.hpp is needed, python 2.x 
   * requirement inherited from OpenCL-HPP submodule to generate cl.hpp
   * cl2.hpp (opencl20 and above) does not have this requirement
