@@ -114,7 +114,7 @@ source_group("Generator" FILES ${GEN_SRC})
 source_group("${CL_SUBDIR}" FILES ${API_HEADERS})
 
 if(BUILD_TEST)
-  add_executable(${PROJECT_NAME}-test ${CMAKE_SOURCE_DIR}/test/test.c)
+  add_executable(${PROJECT_NAME}-test EXCLUDE_FROM_ALL ${CMAKE_SOURCE_DIR}/test/test.c)
   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 endif()
 
