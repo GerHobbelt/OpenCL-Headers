@@ -1,3 +1,4 @@
+#!/bin/gawk -f
 function output_cur_proto() {
   if (CUR_FN) {
     if(!SKIPPING) {
@@ -53,6 +54,18 @@ BEGIN {
   print $0 >> hdr_out;
   next;
 }
+
+#force an empty definition for CL_EXTENSION_WEAK_LINK
+#weak link applies to function prototypes, not global function pointer variables.
+#fixes annoying warning for apple builds
+/#define CL_EXTENSION_WEAK_LINK/ {
+  next;
+}
+
+/CL_EXTENSION_WEAK_LINK/ {
+  gsub( "CL_EXTENSION_WEAK_LINK", "");
+}
+
 
 /^extern CL_API_ENTRY.*DEPRECATED/ {
   CUR_SIG=$0;

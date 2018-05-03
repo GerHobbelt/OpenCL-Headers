@@ -99,20 +99,18 @@ ${includes}
 #if defined(_WIN32)
 # define VC_EXTRALEAN 1
 # include <windows.h>
-# define LIB_PFX ""
-# define LIB_SFX ".dll"
   typedef HMODULE libptr;
   typedef FARPROC funcptr;
   static libptr open_lib(const char* path) { return LoadLibrary( path ); }
   static funcptr find_lib_func(libptr lib, const char* name) { return GetProcAddress( lib, (char*)name ); }
 # define NULL_LIB ((libptr)0)
+# define OPENCL_LIB "OpenCL.dll"
 #elif defined(__ANDROID__) || defined(__linux__) || defined(__APPLE__)
 # include <dlfcn.h>
-# define LIB_PFX "lib"
 # if defined(__APPLE__)
-#   define LIB_SFX ".dylib"
+#   define OPENCL_LIB "/System/Library/Frameworks/OpenCL.framework/OpenCL"
 # else
-#   define LIB_SFX ".so"
+#   define OPENCL_LIB "libOpenCL.so"
 # endif
   typedef void* libptr;
   typedef void* funcptr;
@@ -124,24 +122,12 @@ ${includes}
 #endif
 
 int initialize_opencl(const char* overrideLibName) {
-  static int s_initted = 0;
-  if ( s_initted ) return 1;
+  if ( clGetPlatformIDs ) return 1;
 
-  libptr libopencl = NULL_LIB;
-
-  if(overrideLibName)
-  {
-    libopencl = open_lib(overrideLibName);
-  }
-  else
-  {
-    libopencl = open_lib(LIB_PFX "OpenCL" LIB_SFX);
-    if ( libopencl == NULL_LIB ) { libopencl = open_lib(LIB_PFX "opencl" LIB_SFX); }
-  }
+  libptr libopencl = open_lib(overrideLibName ? overrideLibName : OPENCL_LIB);
   
   if ( libopencl == NULL_LIB ) return 0;
 
-  s_initted = 1;
 EOF
 
   for hdr in ${headers}; do
@@ -149,8 +135,10 @@ EOF
   done
 
   cat >> "${src_out}" << EOF
-  return 1;
+  
+  return !!clGetPlatformIDs;
 }
+
 EOF
 
   cat "${src_out}.decl" >> "${src_out}"
