@@ -1,5 +1,10 @@
 #!/bin/bash
 
+#when invoked by cmake the path may not be properly set up for mingw bash
+if ! (2>&1 which uname) > /dev/null; then
+  export PATH="/usr/bin:/mingw64/bin:/mingw/bin:/bin:${PATH}"
+fi
+
 if [[ "$(uname -s)" == "Darwin" ]]; then
   AWK=awk
   APPLE=true
