@@ -11,6 +11,7 @@ Pending:
 
 Prereqs:
 * cmake 3.11 or greater
+* if generating project for MSVS 2017 Android C++ worfklow - https://github.com/Reification/CMake/releases
 * bash shell and shell tools
   * windows host - git bash
   * apple host - system bash
