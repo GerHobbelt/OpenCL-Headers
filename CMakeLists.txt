@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.11)
-project(OpenCL-Loader)
+project(OpenCL-Loader LANGUAGES C)
 
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 
