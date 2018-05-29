@@ -23,7 +23,7 @@ Prereqs:
 Instructions:
 * clone Repo
 * create a build directory and run cmake from it
-  * set OPENCL_VERSION to the name of any opencl heaader api directory (e.g. opencl12 or opencl20)
+  * set OPENCL_VERSION to the name of any opencl header api directory (e.g. opencl12 or opencl20)
   * default value for OPENCL_VERSION is opencl12
   * set CMAKE_INSTALL_PREFIX to location of lib/ and include/ destination directories
 * generate project, build INSTALL target
