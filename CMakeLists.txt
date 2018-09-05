@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.11)
 project(OpenCL-Loader LANGUAGES C)
 
+# Benn Herrera, Reification Incorporated, (c) 2018
+# For licensing information see file LICENSE in the root of this repo
+
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 
 file(GLOB GEN_SRC "generator/*.*")

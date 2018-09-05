@@ -1,4 +1,6 @@
 #!/bin/bash
+# Benn Herrera, Reification, Incorporated (c) 2018
+# For licensing information see file LICENSE in the root of this repo
 
 #when invoked by cmake the path may not be properly set up for mingw bash
 if ! (2>&1 which uname) > /dev/null; then

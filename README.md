@@ -31,3 +31,6 @@ Instructions:
 * include OCDL/opencl.h in one of your source files
 * call `initialize_opencl((const char*)0)` before invoking any opencl functions
 * profit
+
+Licensing:
+See file LICENSE in the root of this repo

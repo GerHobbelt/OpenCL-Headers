@@ -1,4 +1,8 @@
 #!/bin/gawk -f
+
+# Benn Herrera, Reification, Incorporated (c) 2018
+# For licensing information see file LICENSE in the root of this repo
+
 function output_cur_proto() {
   if (CUR_FN) {
     if(!SKIPPING) {
