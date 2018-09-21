@@ -4,7 +4,7 @@ project(OpenCL-Loader LANGUAGES C)
 # Benn Herrera, Reification Incorporated, (c) 2018
 # For licensing information see file LICENSE in the root of this repo
 
-set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
+set(CMAKE_CONFIGURATION_TYPES "Debug" "Release" CACHE STRING "" FORCE)
 
 file(GLOB GEN_SRC "generator/*.*")
 file(GLOB OPENCL_VERSIONS LIST_DIRECTORIES true RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/opencl*")
@@ -13,7 +13,22 @@ set(OPENCL_VERSION "opencl12" CACHE STRING "OpenCL API Version")
 set_property(CACHE OPENCL_VERSION PROPERTY STRINGS ${OPENCL_VERSIONS})
 
 set(BUILD_TEST false CACHE BOOL "Build simple test program to verify initialization")
-set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install CACHE PATH "Install location for include/ and lib/")
+
+set(INSTALL_TO_REIFY_OMNIBUS FALSE CACHE BOOL "Set install location for iterative testing with ReifyOminbus project")
+
+#if we want to iterate on this library in ReifyOmnibus install it to the unpacked 3rd party location for that project
+if(INSTALL_TO_REIFY_OMNIBUS AND (NOT "${CMAKE_INSTALL_PREFIX}" MATCHES "ReifyOmnibus"))
+	if(WIN32)
+		set(_PLAT "win64")
+	elseif(ANDROID)
+		set(_PLAT "android")
+	endif()
+  	set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/../ReifyOmnibus/build/${_PLAT}/ext" CACHE STRING "" FORCE)
+	unset(_PLAT)
+#if we have the default install prefix (which we will never use) set to a reasonable test location
+elseif((NOT CMAKE_INSTALL_PREFIX) OR ("${CMAKE_INSTALL_PREFIX}" MATCHES "/Program Files"))
+	set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install CACHE STRING "" FORCE)
+endif()
 
 set(CL_SUBDIR "OCDL")
 
