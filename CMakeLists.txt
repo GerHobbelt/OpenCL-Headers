@@ -4,8 +4,6 @@ project(OpenCL-Loader LANGUAGES C)
 # Benn Herrera, Reification Incorporated, (c) 2018
 # For licensing information see file LICENSE in the root of this repo
 
-set(CMAKE_CONFIGURATION_TYPES "Debug" "Release" CACHE STRING "" FORCE)
-
 file(GLOB GEN_SRC "generator/*.*")
 file(GLOB OPENCL_VERSIONS LIST_DIRECTORIES true RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/opencl*")
 
