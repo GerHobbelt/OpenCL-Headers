@@ -315,13 +315,13 @@ extern "C" {
     version_minor = version[1]
     version_patch = version[2]
 
-    is_provisional = extension.get('provisional') == 'true'
-    provisional_label = ' (provisional)' if is_provisional else ''
+    is_beta = extension.get('provisional') == 'true'
+    beta_label = ' (beta)' if is_beta else ''
 %>/***************************************************************
-* ${name}${provisional_label}
+* ${name}${beta_label}
 ***************************************************************/
-%if is_provisional:
-#if defined(CL_ENABLE_PROVISIONAL_EXTENSIONS)
+%if is_beta:
+#if defined(CL_ENABLE_BETA_EXTENSIONS)
 
 %endif
 %if extension.get('condition'):
@@ -350,7 +350,11 @@ extern "C" {
 %        if type.get('name') in typedefs:
 ${typedefs[type.get('name')].Typedef.ljust(27)} ${type.get('name')};
 %        elif type.get('name') in macros:
+%            if macros[type.get('name')].Macro == '':
+${macros[type.get('name')].Define}
+%            else:
 #define ${type.get('name')}${macros[type.get('name')].Macro}
+%            endif
 %        elif type.get('name') in structs:
 <%
     struct = structs[type.get('name')]
@@ -445,8 +449,8 @@ ${api.Name}(
 #endif /* ${extension.get('condition')} */
 
 %endif
-%if is_provisional:
-#endif /* defined(CL_ENABLE_PROVISIONAL_EXTENSIONS) */
+%if is_beta:
+#endif /* defined(CL_ENABLE_BETA_EXTENSIONS) */
 
 %endif
 %  endif
