@@ -2045,6 +2045,23 @@ clGetSemaphoreHandleForTypeKHR(
 #endif /* !defined(CL_NO_NON_ICD_DISPATCH_EXTENSION_PROTOTYPES) */
 
 /***************************************************************
+* cl_khr_external_semaphore_dx_fence (beta)
+***************************************************************/
+#if defined(CL_ENABLE_BETA_EXTENSIONS)
+
+#define cl_khr_external_semaphore_dx_fence 1
+#define CL_KHR_EXTERNAL_SEMAPHORE_DX_FENCE_EXTENSION_NAME \
+    "cl_khr_external_semaphore_dx_fence"
+
+
+#define CL_KHR_EXTERNAL_SEMAPHORE_DX_FENCE_EXTENSION_VERSION CL_MAKE_VERSION(0, 9, 0)
+
+/* cl_external_semaphore_handle_type_khr */
+#define CL_SEMAPHORE_HANDLE_D3D12_FENCE_KHR                 0x2059
+
+#endif /* defined(CL_ENABLE_BETA_EXTENSIONS) */
+
+/***************************************************************
 * cl_khr_external_semaphore_opaque_fd
 ***************************************************************/
 #define cl_khr_external_semaphore_opaque_fd 1
@@ -3169,7 +3186,7 @@ typedef cl_bitfield         cl_diagnostic_verbose_level_intel;
     "cl_intel_unified_shared_memory"
 
 
-#define CL_INTEL_UNIFIED_SHARED_MEMORY_EXTENSION_VERSION CL_MAKE_VERSION(0, 0, 0)
+#define CL_INTEL_UNIFIED_SHARED_MEMORY_EXTENSION_VERSION CL_MAKE_VERSION(1, 1, 0)
 
 typedef cl_bitfield         cl_device_unified_shared_memory_capabilities_intel;
 typedef cl_properties       cl_mem_properties_intel;
@@ -3996,6 +4013,23 @@ clSetContentSizeBufferPoCL(
 #define CL_KHR_EXTENDED_BIT_OPS_EXTENSION_VERSION CL_MAKE_VERSION(1, 0, 0)
 
 /***************************************************************
+* cl_khr_external_memory_android_hardware_buffer (beta)
+***************************************************************/
+#if defined(CL_ENABLE_BETA_EXTENSIONS)
+
+#define cl_khr_external_memory_android_hardware_buffer 1
+#define CL_KHR_EXTERNAL_MEMORY_ANDROID_HARDWARE_BUFFER_EXTENSION_NAME \
+    "cl_khr_external_memory_android_hardware_buffer"
+
+
+#define CL_KHR_EXTERNAL_MEMORY_ANDROID_HARDWARE_BUFFER_EXTENSION_VERSION CL_MAKE_VERSION(0, 9, 2)
+
+/* cl_external_memory_handle_type_khr */
+#define CL_EXTERNAL_MEMORY_HANDLE_ANDROID_HARDWARE_BUFFER_KHR 0x2070
+
+#endif /* defined(CL_ENABLE_BETA_EXTENSIONS) */
+
+/***************************************************************
 * cl_khr_global_int32_base_atomics
 ***************************************************************/
 #define cl_khr_global_int32_base_atomics 1
@@ -4036,16 +4070,14 @@ clSetContentSizeBufferPoCL(
 #define CL_KHR_INT64_EXTENDED_ATOMICS_EXTENSION_VERSION CL_MAKE_VERSION(1, 0, 0)
 
 /***************************************************************
-* cl_khr_kernel_clock (beta)
+* cl_khr_kernel_clock
 ***************************************************************/
-#if defined(CL_ENABLE_BETA_EXTENSIONS)
-
 #define cl_khr_kernel_clock 1
 #define CL_KHR_KERNEL_CLOCK_EXTENSION_NAME \
     "cl_khr_kernel_clock"
 
 
-#define CL_KHR_KERNEL_CLOCK_EXTENSION_VERSION CL_MAKE_VERSION(0, 9, 0)
+#define CL_KHR_KERNEL_CLOCK_EXTENSION_VERSION CL_MAKE_VERSION(1, 0, 0)
 
 /* cl_device_info */
 #define CL_DEVICE_KERNEL_CLOCK_CAPABILITIES_KHR             0x1076
@@ -4056,8 +4088,6 @@ typedef cl_bitfield         cl_device_kernel_clock_capabilities_khr;
 #define CL_DEVICE_KERNEL_CLOCK_SCOPE_DEVICE_KHR             (1 << 0)
 #define CL_DEVICE_KERNEL_CLOCK_SCOPE_WORK_GROUP_KHR         (1 << 1)
 #define CL_DEVICE_KERNEL_CLOCK_SCOPE_SUB_GROUP_KHR          (1 << 2)
-
-#endif /* defined(CL_ENABLE_BETA_EXTENSIONS) */
 
 /***************************************************************
 * cl_khr_local_int32_base_atomics
@@ -4128,6 +4158,21 @@ typedef cl_bitfield         cl_device_kernel_clock_capabilities_khr;
 
 
 #define CL_KHR_SPIRV_NO_INTEGER_WRAP_DECORATION_EXTENSION_VERSION CL_MAKE_VERSION(1, 0, 0)
+
+/***************************************************************
+* cl_khr_spirv_queries
+***************************************************************/
+#define cl_khr_spirv_queries 1
+#define CL_KHR_SPIRV_QUERIES_EXTENSION_NAME \
+    "cl_khr_spirv_queries"
+
+
+#define CL_KHR_SPIRV_QUERIES_EXTENSION_VERSION CL_MAKE_VERSION(1, 0, 0)
+
+/* cl_device_info */
+#define CL_DEVICE_SPIRV_EXTENDED_INSTRUCTION_SETS_KHR       0x12B9
+#define CL_DEVICE_SPIRV_EXTENSIONS_KHR                      0x12BA
+#define CL_DEVICE_SPIRV_CAPABILITIES_KHR                    0x12BB
 
 /***************************************************************
 * cl_khr_srgb_image_writes
